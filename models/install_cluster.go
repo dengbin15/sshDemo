@@ -9,7 +9,7 @@ import (
 )
 
 func InstallCluster() {
-	ticker := time.NewTicker(time.Minute)
+	ticker := time.NewTicker(10*time.Second)
 	for {
 		select {
 		case <- ticker.C :
@@ -19,14 +19,7 @@ func InstallCluster() {
 				return
 			}
 			for _ , cluster := range clusters {
-				flag , err := ReadLog(cluster)
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-				if flag == false {
-					UpdateClusterStatus(cluster.id)
-				}
+				go ReadLog(cluster)
 			}
 		}
 	}
@@ -55,43 +48,43 @@ func GetInstallingClusters() ([]Cluster , error) {
 	}
 }*/
 
-func ReadLog(cluster Cluster) (bool , error){
+func ReadLog(cluster Cluster){
 	ssh := &easyssh.MakeConfig{
 		User : "root" ,
 		Password : "root" ,
 		Server : "10.72.104.188" ,
 		Port : "22" ,
 	}
-	command := "tail -f /var/log/" + cluster.id + ".log"
+	command := "tail -f /var/log/" + cluster.Id + ".log"
 	ticker := time.NewTicker(3*time.Second)
-	var flag = true
+	ch , done , err := ssh.Stream(command)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+FOR1:
 	for {
 		select {
 		case <- ticker.C :
-			ch , done , err := ssh.Stream(command)
-			if err != nil {
-				fmt.Println(err)
-				return false , err
-			}
 			select {
 			case <-done:
-				break
+				break FOR1
 			case line := <-ch:
-				if strings.Contains(line , "failed=") {
-					done <- true
-					if strings.Contains(line , "failed=1") {
-						flag = false
-					}
+				fmt.Println(cluster.Id + " log is: " + line)
+				if strings.Contains(line , "failed=1") {
+					fmt.Println("read log failed=1")
+					UpdateClusterStatus(cluster.Id)
+					break FOR1
 				}
 			}
 		}
 	}
-	return flag , nil
 }
 
 func UpdateClusterStatus(clusterId string) error {
 	o := orm.NewOrm()
-	sql := "update status failed from cluster where id=" + clusterId + ";"
+	sql := `update cluster set status="failed" where id=`+ clusterId + ";"
+	fmt.Println(sql)
 	_ , err := o.Raw(sql).Exec()
 	if err != nil {
 		fmt.Println(err)

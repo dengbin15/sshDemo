@@ -2,14 +2,15 @@ package models
 
 import (
 	"github.com/astaxie/beego/orm"
-	_"github.com/astaxie/beego/session/mysql"
+	_ "github.com/go-sql-driver/mysql"
 	"time"
 )
 
 type Cluster struct {
-	id      string		`orm:"pk;size(36);column(id)" json:"id"`
-	name    string 		`orm:"size(36);column(name)" json:"name"`
-	status  string		`orm:"size(36);column(status)" json:"status"`
+	Id      string		`orm:"pk;size(36);column(id)" json:"id"`
+	Name    string 		`orm:"size(36);column(name)" json:"name"`
+	Status  string		`orm:"size(36);column(status)" json:"status"`
+	CreateTime time.Time `orm:"type(datatime)" json:"createTime"`
 }
 
 type Object struct {
@@ -23,6 +24,6 @@ type CsfObject struct {
 }
 
 func OrmInit() {
-	orm.RegisterModel("",new(Cluster) , new(Object) , new(CsfObject))
+	orm.RegisterModelWithPrefix("",new(Cluster) , new(Object) , new(CsfObject),)
 	orm.RunSyncdb("default", false , true)
 }

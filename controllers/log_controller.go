@@ -3,8 +3,10 @@ package controllers
 import (
 	"fmt"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
 	"net/http"
 	"sshDemo/models"
+	"time"
 )
 
 type LogController struct {
@@ -12,14 +14,31 @@ type LogController struct {
 }
 
 // @router /:id      [get]
-func (lc *LogController)WriteLog() {
-	id := lc.GetString(":id")
-	err := models.WriteLog(id)
+func (c *LogController)WriteLog() {
+	id := c.GetString(":id")
+	go models.WriteLog(id)
+	timeNow := time.Now()
+	//instanceId := fmt.Sprintf("%s",uuid.NewV4())
+	cluster := models.Cluster{
+		Id : id ,
+		Status : "installing",
+		CreateTime : timeNow ,
+	}
+	err := InsertCluster(cluster)
 	if err != nil {
-		fmt.Println("write log failed: ",err)
 		return
 	}
-	lc.Data["json"] = nil
-	lc.Ctx.Output.SetStatus(http.StatusOK)
-	lc.ServeJSON()
+	c.Data["json"] = cluster
+	c.Ctx.Output.SetStatus(http.StatusOK)
+	c.ServeJSON()
+}
+
+func InsertCluster(cluster models.Cluster) error {
+	o := orm.NewOrm()
+	_ , err := o.Insert(&cluster)
+	if err != nil {
+		fmt.Println("insert cluster failed: ", err)
+		return err
+	}
+	return nil
 }

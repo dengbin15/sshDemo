@@ -18,6 +18,7 @@ func init() {
 	database := "ssh_demo"
 	dbLink := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8" , dbUser , dbPassword , dbHost , dbPort , database )
 	err := orm.RegisterDataBase("default" , "mysql" , dbLink , 30)
+	fmt.Println("注册数据库成功")
 	if err != nil {
 		fmt.Println("register database failed: ",err)
 		return
