@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/astaxie/beego/orm"
-	_ "github.com/astaxie/beego/session/mysql"
+	_"github.com/astaxie/beego/session/mysql"
 	"time"
 )
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/astaxie/beego/orm"
 	"github.com/hypersleep/easyssh"
-	"golang.org/x/tools/go/ssa/interp/testdata/src/strings"
+	"strings"
 	"time"
 )
 
