@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func WriteLog() {
+func WriteLog(clusterId string) error {
 	ssh := &easyssh.MakeConfig {
 			User : "root" ,
 			Password : "root" ,
@@ -26,12 +26,13 @@ func WriteLog() {
 			} else {
 				str = timeNow + "failed=0"
 			}
-			command := "echo " + str + " >> /var/log/text.log"
+			command := "echo " + str + " >> /var/log/" + clusterId + ".log"
 			_ , err := ssh.Run(command)
 			if err != nil {
 				fmt.Println("run command failed: " , err)
-				return
+				return err
 			}
 		}
 	}
+	return nil
 }

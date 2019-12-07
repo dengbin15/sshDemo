@@ -47,7 +47,7 @@ func GetInstallingClusters() ([]Cluster , error) {
 	return clusters , nil
 }
 
-func GetTimeoutCluster(clusters []Cluster) ([]Cluster , error) {
+/*func GetTimeoutCluster(clusters []Cluster) ([]Cluster , error) {
 	var timeoutCluster []Cluster
 	for _ , cluster := range clusters {
 		startTime , err :=
@@ -56,7 +56,7 @@ func GetTimeoutCluster(clusters []Cluster) ([]Cluster , error) {
 			return nil , err
 		}
 	}
-}
+}*/
 
 func ReadLog(cluster Cluster) (bool , error){
 	ssh := &easyssh.MakeConfig{
