@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	go models.WriteLog()
+	go models.InstallCluster()
 	beego.Run()
 }
 
