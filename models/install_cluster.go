@@ -18,18 +18,15 @@ func InstallCluster() {
 				fmt.Println(err)
 				return
 			}
-			timeoutCluster , err := GetTimeoutCluster(clusters)
-			if err != nil {
-				fmt.Println("get timeout cluster failed: " , err)
-				return
-			}
-			for _ , cluster := range timeoutCluster {
+			for _ , cluster := range clusters {
 				flag , err := ReadLog(cluster)
 				if err != nil {
 					fmt.Println(err)
 					return
 				}
-
+				if flag == false {
+					UpdateClusterStatus(cluster.id)
+				}
 			}
 		}
 	}
@@ -92,9 +89,9 @@ func ReadLog(cluster Cluster) (bool , error){
 	return flag , nil
 }
 
-func UpdateClusterStatus(cluster Cluster) error {
+func UpdateClusterStatus(clusterId string) error {
 	o := orm.NewOrm()
-	sql := "update status failed from cluster where id=" + cluster.id + ";"
+	sql := "update status failed from cluster where id=" + clusterId + ";"
 	_ , err := o.Raw(sql).Exec()
 	if err != nil {
 		fmt.Println(err)
